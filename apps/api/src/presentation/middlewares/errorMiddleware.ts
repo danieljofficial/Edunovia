@@ -1,9 +1,4 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from "express";
-import {
-  InvalidCredentialsError,
-  MissingPasswordError,
-  UserNotFoundError,
-} from "../errors/authErrors";
 import "dotenv/config";
 import { AppError } from "../errors/genericErrors";
 import { TokenExpiredError } from "jsonwebtoken";

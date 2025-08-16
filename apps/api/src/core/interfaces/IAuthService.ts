@@ -8,5 +8,4 @@ export interface IAuthService {
   register(
     userData: Prisma.UserCreateInput
   ): Promise<{ user: Omit<User, "password"> }>;
-  verifyToken(token: string): Promise<{ userId: number }>;
 }

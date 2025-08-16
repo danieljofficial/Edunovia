@@ -8,20 +8,10 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../../presentation/errors/genericErrors";
+import { passwordService } from "./passwordService";
+import { tokenService } from "./tokenService";
 export class AuthService implements IAuthService {
   constructor(private jwtSecret: string, private saltRounds: number = 10) {}
-
-  private async hashPassword(password: string) {
-    return await bcrypt.hash(password, this.saltRounds);
-  }
-
-  private async comparePasswords(plainText: string, hash: string) {
-    return await bcrypt.compare(plainText, hash);
-  }
-
-  private generateToken(userid: string) {
-    return jwt.sign(userid, this.jwtSecret);
-  }
 
   async register(
     userData: Prisma.UserCreateInput
@@ -38,7 +28,10 @@ export class AuthService implements IAuthService {
     if (existingUser) {
       throw new ConflictError("Email Already Exists!");
     }
-    const hashedPassword = await this.hashPassword(password);
+    const hashedPassword = await passwordService.hashPassword(
+      password,
+      this.saltRounds
+    );
 
     const result = await prisma.user.create({
       data: {
@@ -49,7 +42,11 @@ export class AuthService implements IAuthService {
       },
     });
 
-    const token = this.generateToken(result.id);
+    const token = tokenService.generateToken({
+      id: result.id,
+      role: result.role,
+      email: result.email,
+    });
     const { password: _, ...newUser } = result;
     return { user: newUser, token };
   }
@@ -67,26 +64,23 @@ export class AuthService implements IAuthService {
       throw new BadRequestError("Missing Password!");
     }
 
-    const isValid = await this.comparePasswords(password, user.password);
+    const isValid = await passwordService.comparePasswords(
+      password,
+      user.password
+    );
 
     if (!isValid) {
       throw new UnauthorizedError("Invalid Password!");
     }
 
-    const token = this.generateToken(user.id);
+    const token = tokenService.generateToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
 
     const { password: _, ...userWithoutPassword } = user;
 
     return { user: userWithoutPassword, token };
-  }
-
-  async verifyToken(token: string): Promise<{ userId: number }> {
-    try {
-      const decodedToken = jwt.verify(token, this.jwtSecret);
-      const parsedToken = parseInt(decodedToken as string);
-      return { userId: parsedToken };
-    } catch (error) {
-      throw new UnauthorizedError(`Invalid Token: ${error}`);
-    }
   }
 }

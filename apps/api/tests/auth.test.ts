@@ -1,7 +1,7 @@
-import { prisma } from "../../src/infrastructure/database/prisma";
-import createApp from "../../src/infrastructure/server/app";
+import { prisma } from "../src/infrastructure/database/prisma";
+import createApp from "../src/infrastructure/server/app";
 import request from "supertest";
-import { createTestUserData } from "../testUtils";
+import { createTestUserData } from "./testUtils";
 describe("Authentication tests", () => {
   let app = createApp();
   afterAll(async () => {
@@ -45,7 +45,6 @@ describe("Authentication tests", () => {
 
         password: testData.password,
       });
-      console.log(response.body);
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty("token");
       expect(response.body).toHaveProperty("user");

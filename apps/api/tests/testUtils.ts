@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { UserRole } from "../src/utils/userRoles";
+import { UserRole } from "../src/presentation/types/userRoles";
 
 export const createTestUserData: () => {
   email: String;
