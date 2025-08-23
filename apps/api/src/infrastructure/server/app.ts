@@ -1,6 +1,7 @@
 import helmet from "helmet";
 import { errorHandler } from "../../presentation/middlewares/errorMiddleware";
 import authRoutes from "../../presentation/routes/authRoutes";
+import googleAuthRoutes from "../../presentation/routes/googleAuthRoutes";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
@@ -20,6 +21,7 @@ function createApp() {
   app.use(morgan("dev"));
   app.use(express.json());
   app.use("/auth", authRoutes);
+  app.use(googleAuthRoutes);
   app.use(errorHandler);
   return app;
 }

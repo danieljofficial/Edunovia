@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ForbiddenError, InternalServerError } from "../errors/genericErrors";
 import { tokenService } from "../../core/services/tokenService";
-import { InvalidTokenError } from "../errors/authErrors";
+// import { InvalidTokenError } from "../errors/authErrors";
 import { UserRole } from "../types/userRoles";
 
 export const roleAuthMiddleware = (allowedRoles: string[]) => {
@@ -20,10 +20,10 @@ export const roleAuthMiddleware = (allowedRoles: string[]) => {
       try {
         payload = tokenService.verifyToken(token);
       } catch (error) {
-        throw new InvalidTokenError("Invalid token");
+        // throw new InvalidTokenError("Invalid token");
       }
 
-      if (!allowedRoles.includes(payload.role)) {
+      if (!allowedRoles.includes(payload!.role)) {
         throw new ForbiddenError("Insufficient permissions");
       }
 
