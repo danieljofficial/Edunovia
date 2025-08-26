@@ -14,9 +14,6 @@ passport.use(
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
-        // Find or create user in DB
-        // const email: string = profile.emails && profile.emails?.length > 0 ? profile.emails[0].value : null
-        // const userType: any = req.query.state;
         const state: any = req.query.state as string;
         const allowedRoles = ["STUDENT", "PARENT", "TEACHER", "ADMIN"];
         const userType = allowedRoles.includes(state) ? state : "STUDENT";
@@ -25,15 +22,14 @@ passport.use(
 
         let user = await prisma.user.findUnique({
           where: { email: profile.emails![0].value },
-          // where: {email: email},
         });
         if (!user) {
           user = await prisma.user.create({
             data: {
               email: profile.emails![0].value,
               username: profile.displayName,
-              password: "", // No password for OAuth users
-              role: userType, // Default role, adjust as needed
+              password: "",
+              role: userType,
               isVerified: true,
             },
           });
@@ -47,12 +43,10 @@ passport.use(
 );
 
 export default passport;
-// Serialize user into session
 passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
 
-// Deserialize user from session
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await prisma.user.findUnique({ where: { id } });

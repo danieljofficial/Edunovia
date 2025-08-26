@@ -3,9 +3,7 @@ import passport from "../../core/services/googleOAuthService";
 import { User } from "@prisma/client";
 
 export class GoogleAuthController {
-  // For Students
   static googleAuth(req: Request, res: Response, next: NextFunction) {
-    // Determine user type from query or default to STUDENT
     const allowedRoles: string[] = ["STUDENT", "PARENT", "TEACHER", "ADMIN"];
     const type =
       typeof req.query.type === "string" &&
@@ -27,14 +25,11 @@ export class GoogleAuthController {
         console.log(err);
         return res.redirect("/login?error=oauth_failed");
       }
-      // Here, you can generate a JWT or session
-      // For now, just send user info
       req.logIn(user, (err) => {
         if (err) {
           console.log(err);
           return res.redirect("/login?error=session_failed");
         }
-        // Should take user to their dashboard
         return res.status(200).json({ user });
       });
     })(req, res, next);
