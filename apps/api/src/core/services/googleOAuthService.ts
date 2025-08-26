@@ -10,13 +10,19 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback",
-      // passReqToCallback: true,
+      passReqToCallback: true,
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
         // Find or create user in DB
         // const email: string = profile.emails && profile.emails?.length > 0 ? profile.emails[0].value : null
-        // const userType: string = req.query.type || "STUDENT";
+        // const userType: any = req.query.state;
+        const state: any = req.query.state as string;
+        const allowedRoles = ["STUDENT", "PARENT", "TEACHER", "ADMIN"];
+        const userType = allowedRoles.includes(state) ? state : "STUDENT";
+        console.log("OAuth Callback State:", req.query.state);
+        console.log("Request Query:", req.query);
+
         let user = await prisma.user.findUnique({
           where: { email: profile.emails![0].value },
           // where: {email: email},
@@ -27,7 +33,7 @@ passport.use(
               email: profile.emails![0].value,
               username: profile.displayName,
               password: "", // No password for OAuth users
-              role: "STUDENT", // Default role, adjust as needed
+              role: userType, // Default role, adjust as needed
               isVerified: true,
             },
           });
@@ -41,3 +47,17 @@ passport.use(
 );
 
 export default passport;
+// Serialize user into session
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
+
+// Deserialize user from session
+passport.deserializeUser(async (id: string, done) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id } });
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
