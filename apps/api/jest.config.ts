@@ -4,7 +4,7 @@ const config: Config.InitialOptions = {
   preset: "ts-jest",
   testEnvironment: "node",
   verbose: true,
-  collectCoverage: true,
+  collectCoverage: false,
   coverageDirectory: "./coverage",
   coveragePathIgnorePatterns: [
     "/node_modules/",
@@ -22,7 +22,7 @@ const config: Config.InitialOptions = {
   testMatch: ["**/tests/**/*.test.ts"],
   setupFilesAfterEnv: ["./tests/setup.ts"],
   // globalSetup: "<rootDir>/tests/globalSetup.ts",
-  // globalTeardown: "<rootDir>/tests/globalTeardown.ts",
+  globalTeardown: "<rootDir>/tests/teardown.ts",
 };
 
 export default config;
