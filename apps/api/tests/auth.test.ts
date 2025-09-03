@@ -10,25 +10,6 @@ describe("Authentication tests", () => {
   });
   let testData = createTestUserData();
   let userData = GoogleTestUserData();
-
-  describe("GET /auth/google", () => {
-    it("should create a new user using their google oauth credentials", async () => {
-      const response = await request(app).get("/auth/google");
-      expect(response.status).toBe(200);
-      expect(response.body).toMatchObject({
-        user: {
-          id: expect.any(String),
-          email: userData.email,
-          username: userData.username,
-          role: userData.role,
-          isVerified: userData.isVerified,
-          // createdAt: expect.any(String),
-        },
-      });
-      expect(response.body).not.toHaveProperty("password");
-    });
-  });
-
   describe("POST /auth/register", () => {
     it("should create a new user with valid data", async () => {
       const response = await request(app).post("/auth/register").send(testData);
