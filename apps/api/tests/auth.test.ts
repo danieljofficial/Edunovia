@@ -4,15 +4,14 @@ import request from "supertest";
 import { createTestUserData, GoogleTestUserData } from "./testUtils";
 describe("Authentication tests", () => {
   let app = createApp();
-  afterAll(async () => {
-    await prisma.user.deleteMany();
-    await prisma.$disconnect();
-  });
+  afterAll(async () => {});
   let testData = createTestUserData();
 
-  describe("POST /auth/register", () => {
+  describe("POST /api/auth/register", () => {
     it("should create a new user with valid data", async () => {
-      const response = await request(app).post("/auth/register").send(testData);
+      const response = await request(app)
+        .post("/api/auth/register")
+        .send(testData);
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject({
         token: expect.any(String),
@@ -27,20 +26,62 @@ describe("Authentication tests", () => {
       expect(response.body).not.toHaveProperty("password");
     });
 
-    it("should reject registration with missing required fields (400)", async () => {
-      const testData = createTestUserData();
-      delete testData.username;
-
-      const response = await request(app).post("/auth/register").send(testData);
+    it("should reject invalid email format", async () => {
+      const invalidData = createTestUserData();
+      invalidData.email = "not-an-email";
+      // try {
+      const response = await request(app)
+        .post("/api/auth/register")
+        .send(invalidData);
+      console.log(response.body);
+      expect(response.status).toBe(400);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toBe("All Fields Required!");
+      expect(response.body.errors).toBeDefined();
+      console.log("errors", response.body.errors);
+      expect(response.body.errors).toMatchObject({
+        field: "Invalid email address",
+      });
+    });
+
+    it("should reject invalid username format", async () => {
+      const invalidData = createTestUserData();
+      invalidData.username = "u";
+      const response = await request(app)
+        .post("/api/auth/register")
+        .send(invalidData);
+      console.log(response.body);
+      expect(response.status).toBe(400);
+
+      expect(response.status).toBe(400);
+      expect(response.body.errors).toBeDefined();
+      console.log("errors", response.body.errors);
+      expect(response.body.errors).toMatchObject({
+        field: "Username must be 3–20 characters",
+      });
+    });
+
+    it("should reject invalid username format", async () => {
+      const invalidData = createTestUserData();
+      invalidData.password = "p";
+      const response = await request(app)
+        .post("/api/auth/register")
+        .send(invalidData);
+      console.log(response.body);
+      expect(response.status).toBe(400);
+
+      expect(response.status).toBe(400);
+      expect(response.body.errors).toBeDefined();
+      console.log("errors", response.body.errors);
+      expect(response.body.errors).toMatchObject({
+        field: "Password must be at least 8 characters",
+      });
     });
   });
 
-  describe("POST /auth/login", () => {
+  describe("POST /api/auth/login", () => {
     it("should login with valid email and password", async () => {
-      const response = await request(app).post("/auth/login").send({
+      const response = await request(app).post("/api/auth/login").send({
         email: testData.email,
 
         password: testData.password,
@@ -51,7 +92,7 @@ describe("Authentication tests", () => {
     });
 
     it("should reject login with invalid password (401)", async () => {
-      const response = await request(app).post("/auth/login").send({
+      const response = await request(app).post("/api/auth/login").send({
         email: testData.email,
         password: "false password",
       });
@@ -61,7 +102,7 @@ describe("Authentication tests", () => {
     });
 
     it("should reject login with non-existent email", async () => {
-      const response = await request(app).post("/auth/login").send({
+      const response = await request(app).post("/api/auth/login").send({
         email: "nonexistent@test.com",
         password: "anypassword",
       });

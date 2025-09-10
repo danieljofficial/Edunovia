@@ -42,11 +42,14 @@ export class AuthService implements IAuthService {
       },
     });
 
-    const token = tokenService.generateToken({
-      id: result.id,
-      role: result.role,
-      email: result.email,
-    });
+    const token = tokenService.generateToken(
+      {
+        id: result.id,
+        role: result.role,
+        email: result.email,
+      },
+      "1h"
+    );
     const { password: _, ...newUser } = result;
     return { user: newUser, token };
   }
@@ -73,11 +76,14 @@ export class AuthService implements IAuthService {
       throw new UnauthorizedError("Invalid Password!");
     }
 
-    const token = tokenService.generateToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    const token = tokenService.generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      "1h"
+    );
 
     const { password: _, ...userWithoutPassword } = user;
 
