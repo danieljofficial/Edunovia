@@ -9,7 +9,7 @@ describe("Authentication tests", () => {
     await prisma.$disconnect();
   });
   let testData = createTestUserData();
-  let userData = GoogleTestUserData();
+
   describe("POST /auth/register", () => {
     it("should create a new user with valid data", async () => {
       const response = await request(app).post("/auth/register").send(testData);
