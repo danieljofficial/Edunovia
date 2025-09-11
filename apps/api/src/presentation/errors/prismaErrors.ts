@@ -8,7 +8,7 @@ export function handlePrismaError(error: unknown) {
     }
 
     if (error.code === "2002") {
-      throw new ConflictError("Product Already Exists!");
+      throw new ConflictError("Resource Already Exists!");
     }
   }
   throw error;

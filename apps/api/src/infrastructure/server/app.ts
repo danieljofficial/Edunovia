@@ -6,6 +6,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { FRONTEND_DOMAIN } from "../../utils/domains";
 import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
+import academicRoutes from "../../presentation/routes/academicRoutes";
 
 function createApp() {
   const app = express();
@@ -22,6 +23,7 @@ function createApp() {
   app.use(express.json());
   app.use("/api/auth", authRoutes);
   app.use("/api/password-reset", passwordResetRoutes);
+  app.use("/api/academic", academicRoutes);
   app.use(errorHandler);
   return app;
 }

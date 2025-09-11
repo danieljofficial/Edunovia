@@ -37,7 +37,7 @@ export class PasswordResetController {
         .status(200)
         .json({ success: true, message: "Password reset successfully" });
     } catch (error) {
-      console.error("Reset password error:", error);
+      // console.error("Reset password error:", error);
       throw new BadRequestError("Invalid or expired reset token");
     }
   }
