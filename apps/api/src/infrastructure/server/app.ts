@@ -6,12 +6,10 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import { FRONTEND_DOMAIN } from "../../utils/domains";
-<<<<<<< HEAD
+
+import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
 import session from "express-session";
 import passport from "passport";
-=======
-import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
->>>>>>> 625a39755e177d1d89be3e4c32c5534d798de9f9
 
 function createApp() {
   const app = express();
@@ -34,13 +32,10 @@ function createApp() {
 
   app.use(morgan("dev"));
   app.use(express.json());
-<<<<<<< HEAD
-  app.use("/auth", authRoutes);
-  app.use(googleAuthRoutes);
-=======
+  app.use("/api/auth", authRoutes);
+  app.use("/api/auth/", googleAuthRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/password-reset", passwordResetRoutes);
->>>>>>> 625a39755e177d1d89be3e4c32c5534d798de9f9
   app.use(errorHandler);
   app.use(passport.initialize());
   app.use(passport.session());
