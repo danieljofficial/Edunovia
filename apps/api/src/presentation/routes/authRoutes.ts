@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Router } from "express";
 import { AuthService } from "../../core/services/authService";
-import { AuthController } from "../controllers/authController";
+import { AuthController } from "../controllers/AuthController";
 import { AuthValidators } from "../validators/authValidators";
 import { validateRequest } from "../middlewares/validateRequest";
 const authRoutes = Router();

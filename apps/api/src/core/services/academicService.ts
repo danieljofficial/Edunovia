@@ -100,10 +100,16 @@ export class AcademicService {
   }
 
   async getSessionTerms(sessionId: string) {
-    return await prisma.academicTerm.findMany({
+    const terms = await prisma.academicTerm.findMany({
       where: { sessionId },
       orderBy: { termNumber: "asc" },
     });
+
+    if (!terms || terms.length <= 0) {
+      throw new NotFoundError("Terms not found");
+    }
+
+    return terms;
   }
 
   async getCurrentTerm() {

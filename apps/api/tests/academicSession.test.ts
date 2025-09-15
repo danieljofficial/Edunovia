@@ -2,7 +2,6 @@ import { prisma } from "../src/infrastructure/database/prisma";
 import request from "supertest";
 import createApp from "../src/infrastructure/server/app";
 import { AcademicSession } from "../src/infrastructure/database/generated";
-import { IAcademicTermCreate } from "../src/core/interfaces/IAcademicSession";
 
 describe("Academic Session API", () => {
   let app: any;
@@ -77,7 +76,6 @@ describe("Academic Session API", () => {
 
       expect(response.status).toBe(400);
       expect(response.body.errors).toBeDefined();
-      console.log(response.body.errors);
       expect(response.body.errors.field).toEqual("Session name is required");
     });
 
@@ -132,8 +130,6 @@ describe("Academic Session API", () => {
       const response = await request(app)
         .post("/api/academic/sessions")
         .send(sessionData);
-
-      console.log(response.error);
 
       expect(response.status).toBe(400);
       expect(response.body.message).toContain("Failed to create a new session");
@@ -287,6 +283,71 @@ describe("Academic Session API", () => {
     });
   });
 
+  describe("GET /api/academic/sessions/:sessionId/terms", () => {
+    it("should retrieve terms for a session", async () => {
+      const session = await prisma.academicSession.create({
+        data: {
+          name: "2024/2025 Academic Year",
+          startDate: new Date("2024-09-01"),
+          endDate: new Date("2025-07-31"),
+        },
+      });
+
+      await prisma.academicTerm.createMany({
+        data: [
+          {
+            name: "First Term",
+            termNumber: 1,
+            startDate: new Date("2024-09-01"),
+            endDate: new Date("2024-12-15"),
+            sessionId: session.id,
+          },
+          {
+            name: "Second Term",
+            termNumber: 2,
+            startDate: new Date("2025-01-15"),
+            endDate: new Date("2025-04-15"),
+            sessionId: session.id,
+          },
+        ],
+      });
+
+      const response = await request(app).get(
+        `/api/academic/sessions/${session.id}/terms`
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(2);
+      expect(response.body[0].termNumber).toBe(1);
+      expect(response.body[1].termNumber).toBe(2);
+    });
+
+    it("should return 404 for non-existent session", async () => {
+      const response = await request(app).get(
+        "/api/academic/sessions/non-existent-id/terms"
+      );
+      expect(response.status).toBe(404);
+      expect(response.body.message).toContain("Terms not found");
+    });
+
+    it("should return 404 for session with no terms", async () => {
+      const session = await prisma.academicSession.create({
+        data: {
+          name: "2024/2025 Academic Year",
+          startDate: new Date("2024-09-01"),
+          endDate: new Date("2025-07-31"),
+        },
+      });
+
+      const response = await request(app).get(
+        `/api/academic/sessions/${session.id}/terms`
+      );
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toContain("Terms not found");
+    });
+  });
+
   describe("GET /api/academic/sessions/current", () => {
     it("should return 404 when no current session exists", async () => {
       await prisma.academicSession.updateMany({
@@ -302,6 +363,34 @@ describe("Academic Session API", () => {
   });
 
   describe("GET /api/academic/terms/current", () => {
+    it("should retrieve current academic term", async () => {
+      const session = await prisma.academicSession.create({
+        data: {
+          name: "2024/2025 Academic Year",
+          startDate: new Date("2024-09-01"),
+          endDate: new Date("2025-07-31"),
+          isCurrent: true,
+        },
+      });
+
+      await prisma.academicTerm.create({
+        data: {
+          name: "First Term",
+          termNumber: 1,
+          startDate: new Date("2024-09-01"),
+          endDate: new Date("2024-12-15"),
+          sessionId: session.id,
+          isCurrent: true,
+        },
+      });
+
+      const response = await request(app).get("/api/academic/terms/current");
+
+      expect(response.status).toBe(200);
+      expect(response.body.name).toBe("First Term");
+      expect(response.body.isCurrent).toBe(true);
+    });
+
     it("should return 404 when no current term exists", async () => {
       // Ensure no current term
       await prisma.academicTerm.updateMany({
@@ -310,7 +399,6 @@ describe("Academic Session API", () => {
       });
 
       const response = await request(app).get("/api/academic/terms/current");
-      console.log(response.body);
       expect(response.status).toBe(404);
       expect(response.body.message).toContain("No current term found");
     });

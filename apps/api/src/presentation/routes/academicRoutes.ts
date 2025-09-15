@@ -32,7 +32,7 @@ academicRoutes.post(
 
 academicRoutes.get(
   "/sessions/:sessionId/terms",
-  academicController.getCurrentTerm.bind(academicController)
+  academicController.getSessionTerms.bind(academicController)
 );
 
 academicRoutes.get(
