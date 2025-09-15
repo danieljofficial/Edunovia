@@ -56,7 +56,7 @@ export class PasswordResetController {
       res.status(200).json({ valid: true, message: "Token is valid" });
     } catch (error) {
       console.error("Validate token error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      throw new InternalServerError();
     }
   }
 }

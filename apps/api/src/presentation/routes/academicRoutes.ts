@@ -30,4 +30,14 @@ academicRoutes.post(
   academicController.createTerm.bind(academicController)
 );
 
+academicRoutes.get(
+  "/sessions/:sessionId/terms",
+  academicController.getCurrentTerm.bind(academicController)
+);
+
+academicRoutes.get(
+  "/terms/current",
+  academicController.getCurrentTerm.bind(academicController)
+);
+
 export default academicRoutes;
