@@ -3,7 +3,7 @@ import { Router } from "express";
 import { AuthService } from "../../core/services/authService";
 import { AuthValidators } from "../validators/authValidators";
 import { validateRequest } from "../middlewares/validateRequest";
-import { AuthController } from "../controllers/authController";
+import { AuthController } from "../controllers/AuthController";
 
 const authRoutes = Router();
 
