@@ -6,7 +6,6 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import { FRONTEND_DOMAIN } from "../../utils/domains";
-
 import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
 import session from "express-session";
 import passport from "passport";
@@ -32,8 +31,8 @@ function createApp() {
 
   app.use(morgan("dev"));
   app.use(express.json());
-  app.use("/api/auth", authRoutes);
-  app.use("/api/auth/", googleAuthRoutes);
+  // app.use("/api/auth", authRoutes);
+  app.use("/api/auth", googleAuthRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/password-reset", passwordResetRoutes);
   app.use(errorHandler);
