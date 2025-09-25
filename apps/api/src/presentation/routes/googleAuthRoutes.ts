@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { GoogleAuthController } from "../controllers/GoogleAuthController";
-import passport from "passport";
+// import passport from "passport";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.get("/google", (req, res, next) => {
 
 // Parent
 router.get("/google/parent", (req, res, next) => {
-  res.redirect("/auth/google?type=PARENT");
+  res.redirect("/google?type=PARENT");
 });
 
 // Teacher
@@ -26,5 +26,5 @@ router.get("/google/admin", (req, res, next) => {
 });
 
 // Callback
-router.get("/google/callback", GoogleAuthController.googleAuthCallback);
+router.get("/auth/google/callback", GoogleAuthController.googleAuthCallback);
 export default router;

@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { prisma } from "../../infrastructure/database/prisma";
 import dotenv from "dotenv";
+import { tokenService } from "./tokenService";
 dotenv.config();
 
 passport.use(
@@ -33,8 +34,18 @@ passport.use(
               isVerified: true,
             },
           });
+          const token = tokenService.generateToken(
+            {
+              id: user.id,
+              email: user.email,
+              role: user.role,
+            },
+            "1h"
+          );
+          // const { password: _, ...newUser } = user;
+          return { user: user, token };
         }
-        return done(null, user);
+        // return done(null, user);
       } catch (err) {
         return done(err, false);
       }

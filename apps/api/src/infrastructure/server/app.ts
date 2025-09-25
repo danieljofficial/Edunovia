@@ -33,7 +33,7 @@ function createApp() {
   app.use(morgan("dev"));
   app.use(express.json());
   // app.use("/api/auth", authRoutes);
-  app.use("/api/auth", googleAuthRoutes);
+  app.use(googleAuthRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/password-reset", passwordResetRoutes);
   app.use("/api/academic", academicRoutes);
