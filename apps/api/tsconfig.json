@@ -8,7 +8,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
     // "baseUrl": "./src",
     // "paths": {
     //   "@core/*": ["core/*"],
