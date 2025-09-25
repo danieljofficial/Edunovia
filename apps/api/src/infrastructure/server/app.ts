@@ -9,6 +9,7 @@ import { FRONTEND_DOMAIN } from "../../utils/domains";
 import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
 import session from "express-session";
 import passport from "passport";
+import academicRoutes from "../../presentation/routes/academicRoutes";
 
 function createApp() {
   const app = express();
@@ -35,6 +36,7 @@ function createApp() {
   app.use("/api/auth", googleAuthRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/password-reset", passwordResetRoutes);
+  app.use("/api/academic", academicRoutes);
   app.use(errorHandler);
   app.use(passport.initialize());
   app.use(passport.session());

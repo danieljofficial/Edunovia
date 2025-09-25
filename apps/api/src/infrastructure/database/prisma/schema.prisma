@@ -32,3 +32,34 @@ model PasswordResetToken {
   @@index([userId])
   @@index([expiresAt])
 }
+
+model AcademicSession {
+  id String @id @default(uuid())
+  name String @unique
+  startDate DateTime
+  endDate DateTime
+  isCurrent Boolean @default(false)
+  description String?
+terms AcademicTerm[]
+
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+
+@@map("academic_sessions")
+}
+
+model AcademicTerm {
+  id String @id @default(uuid())
+  name  String 
+  termNumber Int
+  startDate DateTime
+  endDate DateTime
+  isCurrent Boolean @default(false)
+  description String?
+  session AcademicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([sessionId, termNumber])
+  @@map("academic_terms")
+}

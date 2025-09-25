@@ -37,7 +37,7 @@ export class PasswordResetController {
         .status(200)
         .json({ success: true, message: "Password reset successfully" });
     } catch (error) {
-      console.error("Reset password error:", error);
+      // console.error("Reset password error:", error);
       throw new BadRequestError("Invalid or expired reset token");
     }
   }
@@ -56,7 +56,7 @@ export class PasswordResetController {
       res.status(200).json({ valid: true, message: "Token is valid" });
     } catch (error) {
       console.error("Validate token error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      throw new InternalServerError();
     }
   }
 }
