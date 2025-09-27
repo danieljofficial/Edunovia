@@ -7,6 +7,7 @@ import cors from "cors";
 import { FRONTEND_DOMAIN } from "../../utils/domains";
 import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
 import academicRoutes from "../../presentation/routes/academicRoutes";
+import gradeClassArmRoutes from "../../presentation/routes/gradeClassArmRoutes";
 
 function createApp() {
   const app = express();
@@ -24,6 +25,8 @@ function createApp() {
   app.use("/api/auth", authRoutes);
   app.use("/api/password-reset", passwordResetRoutes);
   app.use("/api/academic", academicRoutes);
+  app.use("/api/academic", gradeClassArmRoutes);
+
   app.use(errorHandler);
   return app;
 }
