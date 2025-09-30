@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import { AcademicService } from "../../core/services/academicService";
 import { NextFunction, Request, Response } from "express";
 import {

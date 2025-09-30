@@ -93,7 +93,6 @@ export class GradeClassArmService {
         throw new NotFoundError("Grade not found");
       }
 
-      // Check maximum arms (3 per grade)
       const existingArms = await prisma.classArm.count({
         where: { gradeId: armData.gradeId },
       });
@@ -102,7 +101,6 @@ export class GradeClassArmService {
         throw new BadRequestError("Maximum 3 arms allowed per grade");
       }
 
-      // Check for duplicate arm name in same grade
       const existingArm = await prisma.classArm.findUnique({
         where: {
           gradeId_name: {
@@ -116,7 +114,6 @@ export class GradeClassArmService {
         throw new BadRequestError("Class arm already exists for this grade");
       }
 
-      // Auto-generate full name
       const fullName = armData.fullName || `${grade.name}${armData.name}`;
 
       return await prisma.classArm.create({
@@ -134,15 +131,15 @@ export class GradeClassArmService {
     }
   }
 
-  //   async getClassArmsByGrade(gradeId: string): Promise<any[]> {
-  //     try {
-  //       return await prisma.classArm.findMany({
-  //         where: { gradeId },
-  //         include: { grade: true },
-  //         orderBy: { name: 'asc' }
-  //       });
-  //     } catch (error) {
-  //       throw new Error('Failed to retrieve class arms');
-  //     }
-  //   }
+  async getClassArmsByGrade(gradeId: string): Promise<any[]> {
+    try {
+      return await prisma.classArm.findMany({
+        where: { gradeId },
+        include: { grade: true },
+        orderBy: { name: "asc" },
+      });
+    } catch (error) {
+      throw new Error("Failed to retrieve class arms");
+    }
+  }
 }

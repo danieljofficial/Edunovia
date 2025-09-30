@@ -69,14 +69,18 @@ export class GradeClassArmController {
     }
   }
 
-  //   async getClassArms(req: Request, res: Response): Promise<void> {
-  //     try {
-  //       const { gradeId } = req.params;
-  //       const arms = await this.gradeClassArmService.getClassArmsByGrade(gradeId);
-  //       res.status(200).json(arms);
-  //     } catch (error: any) {
-  //       console.error('Get class arms error:', error);
-  //       res.status(500).json({ message: 'Internal server error' });
-  //     }
-  //   }
+  async getClassArms(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { gradeId } = req.params;
+      const arms = await this.gradeClassArmService.getClassArmsByGrade(gradeId);
+      res.status(200).json(arms);
+    } catch (error) {
+      console.error("Get class arms error:", error);
+      next(error);
+    }
+  }
 }

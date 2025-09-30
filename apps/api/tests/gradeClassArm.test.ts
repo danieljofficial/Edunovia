@@ -20,7 +20,7 @@ describe("Grade and Class Arm API", () => {
     await prisma.$disconnect();
   });
 
-  describe("POST /api/academic/grades", () => {
+  describe("POST /api/v1/academic/grades", () => {
     it("should create a new grade with valid data", async () => {
       const gradeData = {
         level: 1,
@@ -28,7 +28,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(gradeData);
 
       expect(response.status).toBe(201);
@@ -50,7 +50,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(gradeData);
 
       expect(response.status).toBe(201);
@@ -64,7 +64,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(gradeData);
 
       expect(response.status).toBe(400);
@@ -81,7 +81,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(gradeData);
 
       expect(response.status).toBe(400);
@@ -92,7 +92,6 @@ describe("Grade and Class Arm API", () => {
     });
 
     it("should return 400 for duplicate grade level", async () => {
-      // Create first grade
       await prisma.grade.create({
         data: {
           level: 4,
@@ -102,12 +101,12 @@ describe("Grade and Class Arm API", () => {
       });
 
       const gradeData = {
-        level: 4, // Same level
-        section: "SENIOR", // Different section but same level not allowed
+        level: 4,
+        section: "SENIOR",
       };
 
       const response = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(gradeData);
 
       expect(response.status).toBe(400);
@@ -115,27 +114,25 @@ describe("Grade and Class Arm API", () => {
     });
 
     it("should correctly assign JUNIOR/SENIOR sections based on level", async () => {
-      // Test junior grades (1-3)
       const juniorGrade = {
         level: 2,
         section: "JUNIOR",
       };
 
       const juniorResponse = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(juniorGrade);
 
       expect(juniorResponse.status).toBe(201);
       expect(juniorResponse.body.section).toBe("JUNIOR");
 
-      // Test senior grades (4-6)
       const seniorGrade = {
         level: 5,
         section: "SENIOR",
       };
 
       const seniorResponse = await request(app)
-        .post("/api/academic/grades")
+        .post("/api/v1/academic/grades")
         .send(seniorGrade);
 
       expect(seniorResponse.status).toBe(201);
@@ -143,7 +140,7 @@ describe("Grade and Class Arm API", () => {
     });
   });
 
-  describe("POST /api/academic/grades/:gradeId/arms", () => {
+  describe("POST /api/v1/academic/grades/:gradeId/arms", () => {
     let grade: any;
 
     beforeEach(async () => {
@@ -152,6 +149,12 @@ describe("Grade and Class Arm API", () => {
           level: 1,
           name: "Grade 1",
           section: "JUNIOR",
+          arms: {
+            create: [
+              { name: "B", fullName: "Grade 1B" },
+              { name: "C", fullName: "Grade 1C" },
+            ],
+          },
         },
       });
     });
@@ -162,7 +165,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post(`/api/academic/grades/${grade.id}/arms`)
+        .post(`/api/v1/academic/grades/${grade.id}/arms`)
         .send(armData);
 
       expect(response.status).toBe(201);
@@ -178,19 +181,34 @@ describe("Grade and Class Arm API", () => {
     });
 
     it("should auto-generate full name from grade and arm", async () => {
+      await prisma.classArm.deleteMany();
       const armData = {
         name: "B",
       };
 
       const response = await request(app)
-        .post(`/api/academic/grades/${grade.id}/arms`)
+        .post(`/api/v1/academic/grades/${grade.id}/arms`)
         .send(armData);
 
       expect(response.status).toBe(201);
       expect(response.body.fullName).toBe("Grade 1B");
     });
 
+    it("should retrieve all class arms for a grade", async () => {
+      const response = await request(app).get(
+        `/api/v1/academic/grades/${grade.id}/arms`
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(2);
+      expect(response.body[0].gradeId).toBe(grade.id);
+      expect(response.body[0].name).toBe("B");
+      expect(response.body[1].name).toBe("C");
+      expect(response.body[0].fullName).toBe("Grade 1B");
+    });
+
     it("should enforce maximum 3 arms per grade", async () => {
+      await prisma.classArm.deleteMany();
       await prisma.classArm.createMany({
         data: [
           { name: "A", fullName: "Grade 1A", gradeId: grade.id },
@@ -204,7 +222,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post(`/api/academic/grades/${grade.id}/arms`)
+        .post(`/api/v1/academic/grades/${grade.id}/arms`)
         .send(armData);
 
       expect(response.status).toBe(400);
@@ -215,6 +233,7 @@ describe("Grade and Class Arm API", () => {
     });
 
     it("should return 400 for duplicate arm name in same grade", async () => {
+      await prisma.classArm.deleteMany();
       await prisma.classArm.create({
         data: {
           name: "A",
@@ -228,7 +247,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post(`/api/academic/grades/${grade.id}/arms`)
+        .post(`/api/v1/academic/grades/${grade.id}/arms`)
         .send(armData);
 
       expect(response.status).toBe(400);
@@ -243,7 +262,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post(`/api/academic/grades/${grade.id}/arms`)
+        .post(`/api/v1/academic/grades/${grade.id}/arms`)
         .send(armData);
 
       expect(response.status).toBe(400);
@@ -260,7 +279,7 @@ describe("Grade and Class Arm API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/grades/non-existent-id/arms")
+        .post("/api/v1/academic/grades/non-existent-id/arms")
         .send(armData);
       console.log(response.body);
       expect(response.status).toBe(400);
@@ -270,7 +289,7 @@ describe("Grade and Class Arm API", () => {
     });
   });
 
-  describe("GET /api/academic/grades", () => {
+  describe("GET /api/v1/academic/grades", () => {
     it("should retrieve all grades with their arms", async () => {
       const grade1 = await prisma.grade.create({
         data: {
@@ -298,7 +317,7 @@ describe("Grade and Class Arm API", () => {
         },
       });
 
-      const response = await request(app).get("/api/academic/grades");
+      const response = await request(app).get("/api/v1/academic/grades");
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(2);
@@ -318,7 +337,7 @@ describe("Grade and Class Arm API", () => {
       });
 
       const response = await request(app).get(
-        "/api/academic/grades?section=JUNIOR"
+        "/api/v1/academic/grades?section=JUNIOR"
       );
 
       expect(response.status).toBe(200);
@@ -329,7 +348,7 @@ describe("Grade and Class Arm API", () => {
     });
   });
 
-  describe("GET /api/academic/grades/:gradeId", () => {
+  describe("GET /api/v1/academic/grades/:gradeId", () => {
     it("should retrieve a specific grade with arms", async () => {
       const grade = await prisma.grade.create({
         data: {
@@ -346,7 +365,7 @@ describe("Grade and Class Arm API", () => {
       });
 
       const response = await request(app).get(
-        `/api/academic/grades/${grade.id}`
+        `/api/v1/academic/grades/${grade.id}`
       );
 
       expect(response.status).toBe(200);
@@ -356,7 +375,7 @@ describe("Grade and Class Arm API", () => {
 
     it("should return 404 for non-existent grade", async () => {
       const response = await request(app).get(
-        "/api/academic/grades/non-existent-id"
+        "/api/v1/academic/grades/non-existent-id"
       );
       console.log(response.body);
       expect(response.status).toBe(400);

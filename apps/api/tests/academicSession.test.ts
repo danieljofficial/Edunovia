@@ -16,7 +16,7 @@ describe("Academic Session API", () => {
     await prisma.$disconnect();
   });
 
-  describe("POST /api/academic/sessions", () => {
+  describe("POST /api/v1/academic/sessions", () => {
     it("should create a new academic session", async () => {
       const sessionData = {
         name: "2024/2025 Academic Year",
@@ -25,7 +25,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/sessions")
+        .post("/api/v1/academic/sessions")
         .send(sessionData);
 
       expect(response.status).toBe(201);
@@ -57,7 +57,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/sessions")
+        .post("/api/v1/academic/sessions")
         .send(sessionData);
 
       expect(response.status).toBe(201);
@@ -71,7 +71,7 @@ describe("Academic Session API", () => {
 
     it("should return 400 for missing required fields", async () => {
       const response = await request(app)
-        .post("/api/academic/sessions")
+        .post("/api/v1/academic/sessions")
         .send({});
 
       expect(response.status).toBe(400);
@@ -87,7 +87,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/sessions")
+        .post("/api/v1/academic/sessions")
         .send(sessionData);
 
       expect(response.status).toBe(400);
@@ -102,7 +102,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/sessions")
+        .post("/api/v1/academic/sessions")
         .send(sessionData);
 
       expect(response.status).toBe(400);
@@ -128,7 +128,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/sessions")
+        .post("/api/v1/academic/sessions")
         .send(sessionData);
 
       expect(response.status).toBe(400);
@@ -136,7 +136,7 @@ describe("Academic Session API", () => {
     });
   });
 
-  describe("GET /api/academic/sessions", () => {
+  describe("GET /api/v1/academic/sessions", () => {
     it("should retrieve all academic sessions", async () => {
       await prisma.academicSession.createMany({
         data: [
@@ -154,7 +154,7 @@ describe("Academic Session API", () => {
         ],
       });
 
-      const response = await request(app).get("/api/academic/sessions");
+      const response = await request(app).get("/api/v1/academic/sessions");
 
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(2);
@@ -171,7 +171,9 @@ describe("Academic Session API", () => {
         },
       });
 
-      const response = await request(app).get("/api/academic/sessions/current");
+      const response = await request(app).get(
+        "/api/v1/academic/sessions/current"
+      );
 
       expect(response.status).toBe(200);
       expect(response.body.name).toBe("2024/2025 Academic Year");
@@ -179,7 +181,7 @@ describe("Academic Session API", () => {
     });
   });
 
-  describe("POST /api/academic/terms", () => {
+  describe("POST /api/v1/academic/terms", () => {
     let session: AcademicSession;
 
     beforeEach(async () => {
@@ -206,7 +208,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/terms")
+        .post("/api/v1/academic/terms")
         .send(termData);
 
       expect(response.status).toBe(400);
@@ -226,7 +228,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/terms")
+        .post("/api/v1/academic/terms")
         .send(termData);
 
       expect(response.status).toBe(400);
@@ -256,7 +258,7 @@ describe("Academic Session API", () => {
       };
 
       const response = await request(app)
-        .post("/api/academic/terms")
+        .post("/api/v1/academic/terms")
         .send(termData);
 
       expect(response.status).toBe(400);
@@ -271,11 +273,11 @@ describe("Academic Session API", () => {
         termNumber: 1,
         startDate: "2024-09-01T00:00:00Z",
         endDate: "2024-12-15T00:00:00Z",
-        sessionId: "non-existent-id", // Invalid session ID
+        sessionId: "non-existent-id",
       };
 
       const response = await request(app)
-        .post("/api/academic/terms")
+        .post("/api/v1/academic/terms")
         .send(termData);
 
       expect(response.status).toBe(404);
@@ -283,7 +285,7 @@ describe("Academic Session API", () => {
     });
   });
 
-  describe("GET /api/academic/sessions/:sessionId/terms", () => {
+  describe("GET /api/v1/academic/sessions/:sessionId/terms", () => {
     it("should retrieve terms for a session", async () => {
       const session = await prisma.academicSession.create({
         data: {
@@ -313,7 +315,7 @@ describe("Academic Session API", () => {
       });
 
       const response = await request(app).get(
-        `/api/academic/sessions/${session.id}/terms`
+        `/api/v1/academic/sessions/${session.id}/terms`
       );
 
       expect(response.status).toBe(200);
@@ -324,7 +326,7 @@ describe("Academic Session API", () => {
 
     it("should return 404 for non-existent session", async () => {
       const response = await request(app).get(
-        "/api/academic/sessions/non-existent-id/terms"
+        "/api/v1/academic/sessions/non-existent-id/terms"
       );
       expect(response.status).toBe(404);
       expect(response.body.message).toContain("Terms not found");
@@ -340,7 +342,7 @@ describe("Academic Session API", () => {
       });
 
       const response = await request(app).get(
-        `/api/academic/sessions/${session.id}/terms`
+        `/api/v1/academic/sessions/${session.id}/terms`
       );
 
       expect(response.status).toBe(404);
@@ -348,21 +350,23 @@ describe("Academic Session API", () => {
     });
   });
 
-  describe("GET /api/academic/sessions/current", () => {
+  describe("GET /api/v1/academic/sessions/current", () => {
     it("should return 404 when no current session exists", async () => {
       await prisma.academicSession.updateMany({
         where: { isCurrent: true },
         data: { isCurrent: false },
       });
 
-      const response = await request(app).get("/api/academic/sessions/current");
+      const response = await request(app).get(
+        "/api/v1/academic/sessions/current"
+      );
 
       expect(response.status).toBe(404);
       expect(response.body.message).toContain("No current session found");
     });
   });
 
-  describe("GET /api/academic/terms/current", () => {
+  describe("GET /api/v1/academic/terms/current", () => {
     it("should retrieve current academic term", async () => {
       const session = await prisma.academicSession.create({
         data: {
@@ -384,7 +388,7 @@ describe("Academic Session API", () => {
         },
       });
 
-      const response = await request(app).get("/api/academic/terms/current");
+      const response = await request(app).get("/api/v1/academic/terms/current");
 
       expect(response.status).toBe(200);
       expect(response.body.name).toBe("First Term");
@@ -398,7 +402,7 @@ describe("Academic Session API", () => {
         data: { isCurrent: false },
       });
 
-      const response = await request(app).get("/api/academic/terms/current");
+      const response = await request(app).get("/api/v1/academic/terms/current");
       expect(response.status).toBe(404);
       expect(response.body.message).toContain("No current term found");
     });

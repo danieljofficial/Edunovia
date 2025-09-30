@@ -8,6 +8,8 @@ import { FRONTEND_DOMAIN } from "../../utils/domains";
 import passwordResetRoutes from "../../presentation/routes/passwordResetRoutes";
 import academicRoutes from "../../presentation/routes/academicRoutes";
 import gradeClassArmRoutes from "../../presentation/routes/gradeClassArmRoutes";
+import { setupSwagger } from "../../presentation/docs/swagger";
+import healthRoute from "../../presentation/routes/healthRoute";
 
 function createApp() {
   const app = express();
@@ -22,10 +24,14 @@ function createApp() {
 
   app.use(morgan("dev"));
   app.use(express.json());
-  app.use("/api/auth", authRoutes);
-  app.use("/api/password-reset", passwordResetRoutes);
-  app.use("/api/academic", academicRoutes);
-  app.use("/api/academic", gradeClassArmRoutes);
+
+  setupSwagger(app);
+
+  app.use("/health", healthRoute);
+  app.use("/api/v1/auth", authRoutes);
+  app.use("/api/v1/password-reset", passwordResetRoutes);
+  app.use("/api/v1/academic", academicRoutes);
+  app.use("/api/v1/academic", gradeClassArmRoutes);
 
   app.use(errorHandler);
   return app;
