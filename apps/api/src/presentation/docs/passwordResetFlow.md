@@ -1,0 +1,31 @@
+/\*\*
+
+- @swagger
+- components:
+- schemas:
+-     PasswordResetFlow:
+-       type: object
+-       description: |
+-         Complete Password Reset Flow:
+-
+-         1. **Request Reset** → POST /api/v1/password-reset/forgot-password
+-            - User provides email
+-            - System generates reset token (10min expiry)
+-            - Sends email with reset link (if email exists)
+-            - Returns same response for all emails (security)
+-
+-         2. **Validate Token** → POST /api/v1/password-reset/validate-reset-token
+-            - Frontend validates token before showing reset form
+-            - Checks if token exists and is not expired/used
+-
+-         3. **Execute Reset** → POST /api/v1/password-reset/execute-reset
+-            - User provides new password and token
+-            - System validates token and password strength
+-            - Updates password and invalidates token
+-
+-         **Security Features:**
+-         - Tokens expire after 10 minutes
+-         - Tokens are single-use only
+-         - No email enumeration (same response for all emails)
+-         - Password strength validation
+  \*/

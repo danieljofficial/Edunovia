@@ -63,3 +63,20 @@ model AcademicTerm {
   @@unique([sessionId, termNumber])
   @@map("academic_terms")
 }
+
+model Grade {
+  id String @id @default(uuid())
+  level Int 
+  name String
+  section String
+  arms ClassArm[]
+}
+
+model ClassArm {
+  id      String @id @default(uuid())
+  gradeId String
+  name    String   
+  fullName String
+  grade    Grade @relation(fields: [gradeId], references: [id])
+    @@unique([gradeId, name])
+}

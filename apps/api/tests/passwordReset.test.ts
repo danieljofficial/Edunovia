@@ -40,10 +40,10 @@ describe("Password reset flow", () => {
     jest.clearAllMocks();
   });
 
-  describe("POST /api/password-reset/forgot-password", () => {
+  describe("POST /api/v1/password-reset/forgot-password", () => {
     it("should generate reset token for valid email", async () => {
       const response = await request(app)
-        .post("/api/password-reset/forgot-password")
+        .post("/api/v1/password-reset/forgot-password")
         .send({ email: testUser.email });
 
       expect(response.status).toBe(200);
@@ -68,7 +68,7 @@ describe("Password reset flow", () => {
 
     it("should return same response for non-existent email (security)", async () => {
       const response = await request(app)
-        .post("/api/password-reset/forgot-password")
+        .post("/api/v1/password-reset/forgot-password")
         .send({ email: "nonexistent@edunovia.com" });
 
       expect(response.status).toBe(200);
@@ -86,7 +86,7 @@ describe("Password reset flow", () => {
 
     it("should return 400 for invalid email format", async () => {
       const response = await request(app)
-        .post("/api/password-reset/forgot-password")
+        .post("/api/v1/password-reset/forgot-password")
         .send({ email: "invalid-email" });
 
       expect(response.status).toBe(400);
@@ -94,7 +94,7 @@ describe("Password reset flow", () => {
     });
   });
 
-  describe("POST /api/password-reset/execute-reset", () => {
+  describe("POST /api/v1/password-reset/execute-reset", () => {
     let payload: TokenPayload;
     let resetToken: string;
     beforeEach(async () => {
@@ -124,7 +124,7 @@ describe("Password reset flow", () => {
         newPassword: newPassword,
       };
       const response = await request(app)
-        .post("/api/password-reset/execute-reset")
+        .post("/api/v1/password-reset/execute-reset")
         .send(dat);
       expect(response.status).toBe(200);
       expect(response.body.message).toEqual("Password reset successfully");
@@ -148,7 +148,7 @@ describe("Password reset flow", () => {
 
     it("should return 400 for invalid token", async () => {
       const response = await request(app)
-        .post("/api/password-reset/execute-reset")
+        .post("/api/v1/password-reset/execute-reset")
         .send({
           token: "invalid-token",
           newPassword: "newPassword123",
@@ -160,7 +160,7 @@ describe("Password reset flow", () => {
 
     it("should return 400 for weak password", async () => {
       const response = await request(app)
-        .post("/api/password-reset/execute-reset")
+        .post("/api/v1/password-reset/execute-reset")
         .send({
           token: resetToken,
           newPassword: "123",

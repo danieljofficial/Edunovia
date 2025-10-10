@@ -1,4 +1,3 @@
-import { prisma } from "../src/infrastructure/database/prisma";
 import createApp from "../src/infrastructure/server/app";
 import request from "supertest";
 import { createTestUserData, GoogleTestUserData } from "./testUtils";
@@ -7,10 +6,10 @@ describe("Authentication tests", () => {
   afterAll(async () => {});
   let testData = createTestUserData();
 
-  describe("POST /api/auth/register", () => {
+  describe("POST /api/v1/auth/register", () => {
     it("should create a new user with valid data", async () => {
       const response = await request(app)
-        .post("/api/auth/register")
+        .post("/api/v1/auth/register")
         .send(testData);
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject({
@@ -31,7 +30,7 @@ describe("Authentication tests", () => {
       invalidData.email = "not-an-email";
       // try {
       const response = await request(app)
-        .post("/api/auth/register")
+        .post("/api/v1/auth/register")
         .send(invalidData);
       console.log(response.body);
       expect(response.status).toBe(400);
@@ -48,7 +47,7 @@ describe("Authentication tests", () => {
       const invalidData = createTestUserData();
       invalidData.username = "u";
       const response = await request(app)
-        .post("/api/auth/register")
+        .post("/api/v1/auth/register")
         .send(invalidData);
       console.log(response.body);
       expect(response.status).toBe(400);
@@ -65,7 +64,7 @@ describe("Authentication tests", () => {
       const invalidData = createTestUserData();
       invalidData.password = "p";
       const response = await request(app)
-        .post("/api/auth/register")
+        .post("/api/v1/auth/register")
         .send(invalidData);
       console.log(response.body);
       expect(response.status).toBe(400);
@@ -79,9 +78,9 @@ describe("Authentication tests", () => {
     });
   });
 
-  describe("POST /api/auth/login", () => {
+  describe("POST /api/v1/auth/login", () => {
     it("should login with valid email and password", async () => {
-      const response = await request(app).post("/api/auth/login").send({
+      const response = await request(app).post("/api/v1/auth/login").send({
         email: testData.email,
 
         password: testData.password,
@@ -92,7 +91,7 @@ describe("Authentication tests", () => {
     });
 
     it("should reject login with invalid password (401)", async () => {
-      const response = await request(app).post("/api/auth/login").send({
+      const response = await request(app).post("/api/v1/auth/login").send({
         email: testData.email,
         password: "false password",
       });
@@ -102,7 +101,7 @@ describe("Authentication tests", () => {
     });
 
     it("should reject login with non-existent email", async () => {
-      const response = await request(app).post("/api/auth/login").send({
+      const response = await request(app).post("/api/v1/auth/login").send({
         email: "nonexistent@test.com",
         password: "anypassword",
       });
