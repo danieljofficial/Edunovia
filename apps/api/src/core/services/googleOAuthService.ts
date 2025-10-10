@@ -1,4 +1,4 @@
-import passport from "passport";
+import passport, { Profile } from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { prisma } from "../../infrastructure/database/prisma";
 import dotenv from "dotenv";
@@ -10,10 +10,17 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback",
+      callbackURL:
+        process.env.GOOGLE_CALLBACK_URL || "/api/auth/google/callback",
       passReqToCallback: true,
     },
-    async (req, accessToken, refreshToken, profile, done) => {
+    async (
+      req,
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
+      done
+    ) => {
       try {
         const state: any = req.query.state as string;
         const allowedRoles = ["STUDENT", "PARENT", "TEACHER", "ADMIN"];
@@ -21,6 +28,7 @@ passport.use(
         console.log("OAuth Callback State:", req.query.state);
         console.log("Request Query:", req.query);
 
+        let token;
         let user = await prisma.user.findUnique({
           where: { email: profile.emails![0].value },
         });
@@ -34,7 +42,7 @@ passport.use(
               isVerified: true,
             },
           });
-          const token = tokenService.generateToken(
+          token = tokenService.generateToken(
             {
               id: user.id,
               email: user.email,
@@ -43,9 +51,9 @@ passport.use(
             "1h"
           );
           // const { password: _, ...newUser } = user;
-          return { user: user, token };
+          return { user: user, token: token };
         }
-        // return done(null, user);
+        return done(null, user, token);
       } catch (err) {
         return done(err, false);
       }

@@ -20,7 +20,7 @@ export class GoogleAuthController {
 
   static googleAuthCallback(req: Request, res: Response, next: NextFunction) {
     const userType = req.query.state;
-    passport.authenticate("google", (err: Error, user: User) => {
+    passport.authenticate("google", (err: Error, user: User, token: string) => {
       if (err || !user) {
         console.log(err);
         return res.redirect("/login?error=oauth_failed");
@@ -30,7 +30,7 @@ export class GoogleAuthController {
           console.log(err);
           return res.redirect("/login?error=session_failed");
         }
-        return res.status(200).json({ user });
+        return res.status(200).json({ user: user, token: token });
       });
     })(req, res, next);
   }

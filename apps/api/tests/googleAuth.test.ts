@@ -14,7 +14,7 @@ describe("Google OAuth Routes", () => {
   let userData = GoogleTestUserData();
 
   it("should redirect to Google with state=TEACHER", async () => {
-    const res = await request(app).get("/auth/google?type=TEACHER");
+    const res = await request(app).get("/google?type=TEACHER");
     expect(res.status).toBe(302);
     expect(res.headers.location).toContain("accounts.google.com");
     expect(res.headers.location).toContain("state=TEACHER");

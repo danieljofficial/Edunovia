@@ -12,12 +12,12 @@ router.get("/google", (req, res, next) => {
 
 // Parent
 router.get("/google/parent", (req, res, next) => {
-  res.redirect("/google?type=PARENT");
+  res.redirect("/api/auth/google?type=PARENT");
 });
 
 // Teacher
 router.get("/google/teacher", (req, res, next) => {
-  res.redirect("/auth/google?type=TEACHER");
+  res.redirect("/api/auth/google?type=TEACHER");
 });
 
 // Admin
@@ -26,5 +26,5 @@ router.get("/google/admin", (req, res, next) => {
 });
 
 // Callback
-router.get("/auth/google/callback", GoogleAuthController.googleAuthCallback);
+router.get("/google/callback", GoogleAuthController.googleAuthCallback);
 export default router;
