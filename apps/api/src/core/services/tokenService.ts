@@ -4,7 +4,9 @@ import * as jwt from "jsonwebtoken";
 import { InvalidTokenError } from "../../presentation/errors/authErrors";
 import { BadRequestError } from "../../presentation/errors/genericErrors";
 export class JwtTokenService implements ITokenService {
-  constructor(private readonly secret: string) {}
+  constructor(private readonly secret: string) {
+    this.secret = "bd4d099b3d394aada59cc45dfac8eaf0";
+  }
   generateToken(
     payload: TokenPayload,
     expiresIn: jwt.SignOptions["expiresIn"]

@@ -19,13 +19,11 @@ export const roleAuthMiddleware = (allowedRoles: string[]) => {
     try {
       payload = tokenService.verifyToken(token);
     } catch (error) {
-      // throw new InvalidTokenError("Invalid token");
-      return next(new InvalidTokenError("Invalid token"));
+      throw new InvalidTokenError("Invalid token");
     }
 
-    if (!payload?.role || !allowedRoles.includes(payload.role)) {
-      // throw new ForbiddenError("Insufficient permissions");
-      return next(new ForbiddenError("Insufficient permissions"));
+    if (!allowedRoles.includes(payload.role!)) {
+      throw new ForbiddenError("Insufficient permissions");
     }
 
     (req as any).user = payload;

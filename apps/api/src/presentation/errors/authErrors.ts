@@ -26,11 +26,18 @@ export class MissingPasswordError extends Error {
   }
 }
 
+// export class InvalidTokenError extends Error {
+//   statusCode: number;
+//   constructor(message = "Invalid Token") {
+//     super(message);
+//     this.name = "InvalidTokenError";
+//     this.statusCode = 401;
+//   }
+// }
 export class InvalidTokenError extends Error {
-  statusCode: number;
-  constructor(message = "Invalid Token") {
+  constructor(message: string = "Invalid Auth Token") {
     super(message);
     this.name = "InvalidTokenError";
-    this.statusCode = 401;
+    Object.setPrototypeOf(this, InvalidTokenError.prototype);
   }
 }

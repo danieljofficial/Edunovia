@@ -20,7 +20,7 @@ export class PasswordResetService {
     const user = await prisma.user.findFirst({
       where: { email: request.email },
     });
-
+    // console.log(user);
     if (!user) return;
 
     const passwordResetToken = this.jwtService.generateToken(

@@ -1,6 +1,6 @@
 import createApp from "../src/infrastructure/server/app";
 import request from "supertest";
-import { createTestUserData } from "./testUtils";
+import { createTestUserData, GoogleTestUserData } from "./testUtils";
 describe("Authentication tests", () => {
   let app = createApp();
   afterAll(async () => {});
